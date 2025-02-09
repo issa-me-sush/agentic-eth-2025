@@ -85,7 +85,7 @@ const getAppUrl = (message: string) => {
   if (msg.includes('uniswap')) {
     const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
     return {
-      url: `https://app.poink.xyz/ethglobal/${chain}${tokenAddress ? `?token=${tokenAddress}` : ''}`,
+      url: `https://app.poink.xyz/embed?url=https://app.uniswap.org/#/swap${tokenAddress ? `?inputCurrency=${tokenAddress}` : ''}`,
       text: `I'll help you trade${tokenAddress ? ' this token' : ''} on Uniswap (${chain.charAt(0).toUpperCase() + chain.slice(1)})!
 
 1. Connect MetaMask or any EVM wallet
@@ -97,10 +97,10 @@ ${tokenAddress ? "I've pre-loaded your token. " : ""}What would you like to do n
   }
   
   if (msg.includes('cowswap')) {
-    const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
+    const chain = msg.includes('arbitrum') ? '42161' : '8453'; // Chain IDs for Arbitrum and Base
     return {
-      url: `https://app.poink.xyz/ethglobal/${chain}/cowswap${tokenAddress ? `?token=${tokenAddress}` : ''}`,
-      text: `Loading CoW Swap on ${chain}! Benefits include:
+      url: `https://app.poink.xyz/embed?url=https://swap.cow.fi/#/${chain}/swap/WETH${tokenAddress ? `/${tokenAddress}` : ''}`,
+      text: `Loading CoW Swap on ${chain === '42161' ? 'Arbitrum' : 'Base'}! Benefits include:
 1. MEV protection
 2. Better prices through batch auctions
 3. Gasless orders
@@ -111,7 +111,7 @@ ${tokenAddress ? "Your token is pre-loaded. " : ""}Ready to connect your wallet?
   
   if (msg.includes('increment') || msg.includes('flow')) {
     return {
-      url: `https://app.poink.xyz/ethglobal/flow${tokenAddress ? `?token=${tokenAddress}` : ''}`,
+      url: `https://app.poink.xyz/embed?url=https://app.increment.fi/swap${tokenAddress ? `?in=flow-token&out=${tokenAddress}` : ''}`,
       text: `Opening Increment on Flow! Important info:
 1. Connect your Flow wallet
 2. Transaction fees are minimal
@@ -126,7 +126,7 @@ ${tokenAddress ? "I've set up the token pair. " : ""}Ready to trade on Flow?`
     if (tokenAddress.startsWith('0x')) {
       const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
       return {
-        url: `https://app.poink.xyz/ethglobal/${chain}?token=${tokenAddress}`,
+        url: `https://app.poink.xyz/embed?url=https://app.uniswap.org/#/swap?inputCurrency=${tokenAddress}`,
         text: `I see you want to trade on ${chain}! I've loaded Uniswap with your token.
 
 Would you like to:
@@ -136,7 +136,7 @@ Would you like to:
       };
     } else {
       return {
-        url: `https://app.poink.xyz/ethglobal/flow?token=${tokenAddress}`,
+        url: `https://app.poink.xyz/embed?url=https://app.increment.fi/swap?in=flow-token&out=${tokenAddress}`,
         text: `I see you're interested in trading on Flow! I've loaded Increment with your token.
 
 Would you like to:
@@ -150,7 +150,7 @@ Would you like to:
   // Chain-specific requests
   if (msg.includes('arbitrum')) {
     return {
-      url: 'https://app.poink.xyz/ethglobal/arbitrum',
+      url: `https://app.poink.xyz/embed?url=https://app.uniswap.org/#/swap?chain=arbitrum`,
       text: `I've set up Uniswap on Arbitrum for you.
 
 Quick setup:
@@ -164,7 +164,7 @@ What would you like to trade?`
 
   if (msg.includes('base')) {
     return {
-      url: 'https://app.poink.xyz/ethglobal/base',
+      url: `https://app.poink.xyz/embed?url=https://app.uniswap.org/#/swap?chain=base`,
       text: `Loading Uniswap on Base.
 
 Getting started:

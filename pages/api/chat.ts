@@ -65,6 +65,10 @@ INTERACTION RULES:
 
 Be concise but informative, and always prioritize user security and optimal trading routes.`;
 
+// First, let's define the chain types at the top of the file
+type SupportedChain = 'arbitrum' | 'base' | 'flow';
+
+// Update the extractTokenAddress function to be more specific
 const extractTokenAddress = (message: string): string | undefined => {
   // Match Ethereum-style (Base/Arbitrum) or Flow addresses
   const addressRegex = /(0x[a-fA-F0-9]{40})|([A-Z0-9a-z.]{5,64})/;
@@ -72,6 +76,7 @@ const extractTokenAddress = (message: string): string | undefined => {
   return match?.[0];
 };
 
+// Update the getAppUrl function to use type safety
 const getAppUrl = (message: string) => {
   const msg = message.toLowerCase();
   const tokenAddress = extractTokenAddress(message);
@@ -80,7 +85,7 @@ const getAppUrl = (message: string) => {
   if (msg.includes('uniswap')) {
     const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
     return {
-      url: APPS[chain].uniswap.buildUrl(tokenAddress),
+      url: `https://app.poink.xyz/ethglobal/${chain}${tokenAddress ? `?token=${tokenAddress}` : ''}`,
       text: `I'll help you trade${tokenAddress ? ' this token' : ''} on Uniswap (${chain.charAt(0).toUpperCase() + chain.slice(1)})!
 
 1. Connect MetaMask or any EVM wallet
@@ -94,7 +99,7 @@ ${tokenAddress ? "I've pre-loaded your token. " : ""}What would you like to do n
   if (msg.includes('cowswap')) {
     const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
     return {
-      url: APPS[chain].cowswap.buildUrl(tokenAddress),
+      url: `https://app.poink.xyz/ethglobal/${chain}/cowswap${tokenAddress ? `?token=${tokenAddress}` : ''}`,
       text: `Loading CoW Swap on ${chain}! Benefits include:
 1. MEV protection
 2. Better prices through batch auctions
@@ -106,7 +111,7 @@ ${tokenAddress ? "Your token is pre-loaded. " : ""}Ready to connect your wallet?
   
   if (msg.includes('increment') || msg.includes('flow')) {
     return {
-      url: APPS.flow.increment.buildUrl(tokenAddress),
+      url: `https://app.poink.xyz/ethglobal/flow${tokenAddress ? `?token=${tokenAddress}` : ''}`,
       text: `Opening Increment on Flow! Important info:
 1. Connect your Flow wallet
 2. Transaction fees are minimal
@@ -119,10 +124,9 @@ ${tokenAddress ? "I've set up the token pair. " : ""}Ready to trade on Flow?`
   // Chain-specific requests with token
   if (tokenAddress) {
     if (tokenAddress.startsWith('0x')) {
-      // EVM address - determine chain context
       const chain = msg.includes('arbitrum') ? 'arbitrum' : 'base';
       return {
-        url: APPS[chain].uniswap.buildUrl(tokenAddress),
+        url: `https://app.poink.xyz/ethglobal/${chain}?token=${tokenAddress}`,
         text: `I see you want to trade on ${chain}! I've loaded Uniswap with your token.
 
 Would you like to:
@@ -131,9 +135,8 @@ Would you like to:
 - Try CoW Swap instead?`
       };
     } else {
-      // Assume Flow address
       return {
-        url: APPS.flow.increment.buildUrl(tokenAddress),
+        url: `https://app.poink.xyz/ethglobal/flow?token=${tokenAddress}`,
         text: `I see you're interested in trading on Flow! I've loaded Increment with your token.
 
 Would you like to:
@@ -147,7 +150,7 @@ Would you like to:
   // Chain-specific requests
   if (msg.includes('arbitrum')) {
     return {
-      url: APPS.arbitrum.uniswap.baseUrl,
+      url: 'https://app.poink.xyz/ethglobal/arbitrum',
       text: `I've set up Uniswap on Arbitrum for you.
 
 Quick setup:
@@ -161,7 +164,7 @@ What would you like to trade?`
 
   if (msg.includes('base')) {
     return {
-      url: APPS.base.uniswap.baseUrl,
+      url: 'https://app.poink.xyz/ethglobal/base',
       text: `Loading Uniswap on Base.
 
 Getting started:
@@ -170,6 +173,18 @@ Getting started:
 3. Growing ecosystem
 
 Ready to start trading?`
+    };
+  }
+
+  if (msg.includes('chat')) {
+    return {
+      url: 'https://app.poink.xyz/embed?url=https%3A%2F%2Fpoink-chat-ethglobal.vercel.app',
+      text: `Opening our Web3 chat interface! Here you can:
+1. Connect with other traders
+2. Get real-time market insights
+3. Share trading strategies
+
+Ready to join the conversation?`
     };
   }
 
@@ -198,7 +213,7 @@ Let me know your preference, and I'll help you get started!`
     };
   }
 
-  // Default welcome response
+  // Default welcome response (gm)
   return {
     url: 'https://app.poink.xyz/ethglobal',
     text: `Welcome! I'm your cross-chain DeFi assistant. I can help you trade on:
